@@ -1,31 +1,55 @@
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace briskbot.access
 {
+    [JsonObject]
     public class GameResult
     {
-        public string version {get;set;}
-        public string service {get;set;}
-        public int game {get;set;}
-        public int player {get;set;}
-        public string token {get;set;}
+        [JsonProperty]
+        public string version;
+
+        [JsonProperty]
+        public string service;
+        
+        [JsonProperty]
+        public int game;
+        
+        [JsonProperty]
+        public int player;
+        
+        [JsonProperty]
+        public string token;
     }
 
     public class GameState
     {
-        public string version {get;set;}
-        public string service {get;set;}
-        public int game {get;set;}
-        public int num_players {get;set;}
-        public int num_turns_taken {get;set;}
-        public int num_armies {get;set;}
-        public List<Territory> territories {get;set;}
+        
+        [JsonProperty]
+        public string version;
+        
+        [JsonProperty]
+        public string service;
+        
+        [JsonProperty]
+        public int game;
+        
+        [JsonProperty]
+        public int num_players;
+        public int num_turns_taken;
+        public int num_armies;
+        public Territory[] territories;
     }
 
     public class Territory
     {
-        public int territory {get;set;}
-        public int player {get;set;}
-        public int num_armies {get;set;}
+        
+        [JsonProperty]
+        public int territory;
+        
+        [JsonProperty]
+        public int player;
+        
+        [JsonProperty]
+        public int num_armies;
     }
 }

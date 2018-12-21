@@ -1,2 +1,56 @@
 # briskbot
-A bot for the brisk challenge
+A bot for the [brisk challenge](http://www.briskchallenge.com)
+
+Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/2.2)
+
+*This document will be subject to change*
+
+## Roadmap
+* ~~Build Hello World console app~~
+* ~~Make call to API~~
+  * ~~API: Create Game~~
+* ~~Add Unit Tests~~
+* ~~Implement pass-turn-till-end gameplay~~
+  * ~~API: Check for Turn~~
+  * ~~API: End Turn~~
+* Error Handling
+  * Handle faulty server calls
+* Refine console logging
+* Clean up "config" settings, like urls
+* Set armies randomly
+  * requies mapping
+* Attack randomly
+* Implement strategies
+  * Analysize map
+  * Set continent goals
+  * determine territory priorities
+  * determine army construction
+* Implement Tactics
+  * Build logic for when to halt attack
+  * build army war path
+* Implement PvP
+  * Create a joinable game
+  * Join a game
+  * Defeat all my friends
+  * Salvage relationships afterwards
+
+## Design Philosophy
+* Build only what you need
+* Make refactor easy
+* Break into vertical slices
+
+## Design Decisions
+* .NET Core
+  * Chose Core over Framework for cross-platform distribution, since there is no guarantee any of the team reviewing will be using Windows.
+    * This has implications as the packages that can be imported are limited, but workarounds were not overly laborious.
+* Unit Testing
+  * Unit Tests should define what is expected from a function
+  * Only build and test what you need
+  * Created used decorator pattern over HttpClient for dependency injection and mocking
+* Async
+  * Call async methods from async whenever possible.
+  * Only in the main console app will we block and wait for the tasks to resolve, since there is only one thread at the console, it will be deadlocked with any competing resources.
+
+## What I Could Have Done Differently
+* Using .NET Framework (and going solution heavy with Visual Studio) could have saved some time
+* Some of the unit tests could have been heavy on pre-optimization.
