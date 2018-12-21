@@ -11,5 +11,4 @@ namespace briskbot.tests
             Assert.True(true);
         }
     }
-
 }
