@@ -15,8 +15,8 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
   * ~~API: End Turn~~
 * Error Handling
   * Handle faulty server calls
-* Refine console logging
 * Clean up "config" settings, like urls
+* Refine console logging
 * Set armies randomly
   * requies mapping
 * Attack randomly
@@ -50,7 +50,14 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
 * Async
   * Call async methods from async whenever possible.
   * Only in the main console app will we block and wait for the tasks to resolve, since there is only one thread at the console, it will be deadlocked with any competing resources.
+* HttpClient is created in Main and left open to reduce overhead of spinning new clients for each request
+  * new HttpClients can take ~35 ms to instantiate.
+  * The application life is short enough to not run into problems like invalid DNS registers.
 
 ## What I Could Have Done Differently
 * Using .NET Framework (and going solution heavy with Visual Studio) could have saved some time
 * Some of the unit tests could have been heavy on pre-optimization.
+
+## Bug Report
+*AKA: my shame*
+* Ctrl+C is not exitting program.

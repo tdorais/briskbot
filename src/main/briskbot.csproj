@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\access\access.csproj"/>
+    <ProjectReference Include="..\access\access.csproj" />
+    <ProjectReference Include="..\game\game.csproj" />
   </ItemGroup>
 </Project>

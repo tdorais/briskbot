@@ -5,18 +5,21 @@ using Moq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net;
+using briskbot.game;
 
 namespace briskbot.tests
 {
     public class GameAccessTests
     {
         private readonly Mock<IApiClient> mockClient;
-        private readonly GameAccess client;
+        private readonly Mock<IGameAccess> mockAccess;
+        private readonly GameAccess access;
 
         public GameAccessTests()
         {
-            mockClient = new Mock<IApiClient>();;
-            client = new GameAccess(mockClient.Object);
+            mockClient = new Mock<IApiClient>();
+            mockAccess = new Mock<IGameAccess>();
+            access = new GameAccess(mockClient.Object);
         }
 
         [Fact]
@@ -26,7 +29,7 @@ namespace briskbot.tests
             createdResponse.Content = new StringContent("{'game':1}");    
             mockClient.Setup(c => c.Post("/v1/brisk/game", It.IsAny<HttpContent>())).ReturnsAsync(createdResponse);  
 
-            GameResult actual = await client.CreateGame();
+            GameResult actual = await access.CreateGame("Test Tanks");
 
             Assert.Equal<int>(1, actual.game);
         }
@@ -38,7 +41,7 @@ namespace briskbot.tests
             createdResponse.Content = new StringContent("{'player':1}");    
             mockClient.Setup(c => c.Post("/v1/brisk/game", It.IsAny<HttpContent>())).ReturnsAsync(createdResponse);  
 
-            GameResult actual = await client.CreateGame();
+            GameResult actual = await access.CreateGame("Test Tanks");
 
             Assert.Equal<int>(1, actual.player);
         }
@@ -50,7 +53,7 @@ namespace briskbot.tests
             playerStateResponse.Content = new StringContent("{'current_turn':true}");
             mockClient.Setup(c => c.Get("/v1/brisk/game/1/player/1")).ReturnsAsync(playerStateResponse);
 
-            PlayerState actual = await client.GetPlayerState(1,1);
+            PlayerState actual = await access.GetPlayerState(1,1);
 
             Assert.True(actual.current_turn);
         }
@@ -62,7 +65,7 @@ namespace briskbot.tests
             playerStateResponse.Content = new StringContent("{'current_turn':true}");
             mockClient.Setup(c => c.Get("/v1/brisk/game/1/player/1?check_turn=true")).ReturnsAsync(playerStateResponse);
 
-            Turn actual = await client.CheckTurn(1,1);
+            Turn actual = await access.CheckTurn(1,1);
 
             Assert.True(actual.current_turn);
         }
@@ -77,7 +80,7 @@ namespace briskbot.tests
             playerStateResponse.Content = new StringContent(body);
             mockClient.Setup(c => c.Get("/v1/brisk/game/1/player/1?check_turn=true")).ReturnsAsync(playerStateResponse);
 
-            Turn actual = await client.CheckTurn(1,1);
+            Turn actual = await access.CheckTurn(1,1);
 
             Assert.Equal<int?>(result, actual.winner);
         }
@@ -88,9 +91,31 @@ namespace briskbot.tests
             HttpResponseMessage okResponse = new HttpResponseMessage(HttpStatusCode.OK);
             mockClient.Setup(c => c.Post("/v1/brisk/game/1/player/1", It.IsAny<HttpContent>())).ReturnsAsync(okResponse);
 
-            HttpStatusCode actual = await client.EndTurn(1,1,"");
+            HttpStatusCode actual = await access.EndTurn(1,1,"");
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, actual);
+        }
+
+        [Theory]
+        [InlineData(true, null, TurnStatus.TookTurn)]
+        [InlineData(true, 0, TurnStatus.TookTurn)]
+        [InlineData(false, null, TurnStatus.Waiting)]
+        [InlineData(false, 0, TurnStatus.Waiting)]
+        [InlineData(true, 1, TurnStatus.WonGame)]
+        [InlineData(false, 1, TurnStatus.WonGame)]
+        [InlineData(true, 2, TurnStatus.LostGame)]
+        [InlineData(false, 2, TurnStatus.LostGame)]
+        public async Task TakeTurnReturnsStatus(bool currentTurn, int? winner, TurnStatus status)
+        {
+            GameResult mockedResult = new GameResult(){player = 1};
+            Turn mockedTurn = new Turn() {winner = winner, current_turn = currentTurn};
+            mockAccess.Setup(a => a.CreateGame(It.IsAny<string>())).ReturnsAsync(mockedResult);
+            mockAccess.Setup(a => a.CheckTurn(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(mockedTurn);
+            WarRoom board = await WarRoom.CreateWarRoom(mockAccess.Object);
+
+            TurnStatus actual = await board.TakeTurn();
+
+            Assert.Equal(status, actual);
         }
     }
 }
