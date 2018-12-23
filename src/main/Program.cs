@@ -31,8 +31,10 @@ namespace briskbot
             IApiClient apiClient = new ApiClient(client);
             GameAccess newAccess = new GameAccess(apiClient);  
             WarRoom board = await WarRoom.CreateWarRoom(newAccess);
-            int waitCount = 0;
 
+            Console.WriteLine($"Game: {board.GameId}");
+
+            int waitCount = 0;
             while(waitCount < 10)
             {
                 TurnStatus state = await board.TakeTurn();
