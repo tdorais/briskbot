@@ -23,6 +23,24 @@ namespace briskbot.tests
         }
 
         [Fact]
+        public async Task PostCallsThatReturnNonSuccessfullyThrowExceptions()
+        {
+            HttpResponseMessage badResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            mockClient.Setup(c => c.Post("/v1/brisk/game", It.IsAny<HttpContent>())).ReturnsAsync(badResponse);  
+
+            await Assert.ThrowsAsync<Exception>(() => access.CreateGame("Test Tanks"));
+        }
+
+        [Fact]
+        public async Task GetCallsThatReturnNonSuccessfullyThrowExceptions()
+        {
+            HttpResponseMessage badResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            mockClient.Setup(c => c.Get("/v1/brisk/game/1/player/1?check_turn=true")).ReturnsAsync(badResponse);
+
+            await Assert.ThrowsAsync<Exception>(() => access.CheckTurn(1,1));
+        }
+
+        [Fact]
         public async Task CreateGameReturnsGameId()
         {   
             HttpResponseMessage createdResponse = new HttpResponseMessage(HttpStatusCode.OK);
