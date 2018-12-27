@@ -13,8 +13,8 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
 * ~~Implement pass-turn-till-end gameplay~~
   * ~~API: Check for Turn~~
   * ~~API: End Turn~~
-* Error Handling
-  * Handle faulty server calls
+* ~~Error Handling~~
+  * ~~Handle faulty server calls~~
 * Clean up "config" settings, like urls
 * Refine console logging
 * Set armies randomly
