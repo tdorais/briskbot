@@ -52,7 +52,10 @@ namespace briskbot.access
         private async Task<T> Get<T>(string url)
         {
             HttpResponseMessage response = await client.Get(url);
-            string content = await response.Content.ReadAsStringAsync();
+            string content = response.Content != null ? await response.Content.ReadAsStringAsync() : string.Empty;
+
+            if(!response.IsSuccessStatusCode)
+                throw new Exception($"{(int)response.StatusCode} {response.ReasonPhrase}: {content}");
 
             T result = JsonConvert.DeserializeObject<T>(content);
 
@@ -62,7 +65,11 @@ namespace briskbot.access
         private async Task<T> Post<T>(string url, HttpContent httpContent)
         {
             HttpResponseMessage response = await client.Post(url, httpContent);
-            string content = await response.Content.ReadAsStringAsync();
+
+            string content = response.Content != null ? await response.Content.ReadAsStringAsync() : string.Empty;
+
+            if(!response.IsSuccessStatusCode)
+                throw new Exception($"{(int)response.StatusCode} {response.ReasonPhrase}: {content}");
 
             T result = JsonConvert.DeserializeObject<T>(content);
 

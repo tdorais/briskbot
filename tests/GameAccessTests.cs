@@ -12,14 +12,32 @@ namespace briskbot.tests
     public class GameAccessTests
     {
         private readonly Mock<IApiClient> mockClient;
-        private readonly Mock<IGameAccess> mockAccess;
         private readonly GameAccess access;
 
         public GameAccessTests()
         {
+            var mockAccess = new Mock<IGameAccess>();
             mockClient = new Mock<IApiClient>();
-            mockAccess = new Mock<IGameAccess>();
+            
             access = new GameAccess(mockClient.Object);
+        }
+
+        [Fact]
+        public async Task PostCallsThatReturnNonSuccessfullyThrowExceptions()
+        {
+            HttpResponseMessage badResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            mockClient.Setup(c => c.Post("/v1/brisk/game", It.IsAny<HttpContent>())).ReturnsAsync(badResponse);  
+
+            await Assert.ThrowsAsync<Exception>(() => access.CreateGame("Test Tanks"));
+        }
+
+        [Fact]
+        public async Task GetCallsThatReturnNonSuccessfullyThrowExceptions()
+        {
+            HttpResponseMessage badResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            mockClient.Setup(c => c.Get("/v1/brisk/game/1/player/1?check_turn=true")).ReturnsAsync(badResponse);
+
+            await Assert.ThrowsAsync<Exception>(() => access.CheckTurn(1,1));
         }
 
         [Fact]
@@ -94,28 +112,6 @@ namespace briskbot.tests
             HttpStatusCode actual = await access.EndTurn(1,1,"");
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, actual);
-        }
-
-        [Theory]
-        [InlineData(true, null, TurnStatus.TookTurn)]
-        [InlineData(true, 0, TurnStatus.TookTurn)]
-        [InlineData(false, null, TurnStatus.Waiting)]
-        [InlineData(false, 0, TurnStatus.Waiting)]
-        [InlineData(true, 1, TurnStatus.WonGame)]
-        [InlineData(false, 1, TurnStatus.WonGame)]
-        [InlineData(true, 2, TurnStatus.LostGame)]
-        [InlineData(false, 2, TurnStatus.LostGame)]
-        public async Task TakeTurnReturnsStatus(bool currentTurn, int? winner, TurnStatus status)
-        {
-            GameResult mockedResult = new GameResult(){player = 1};
-            Turn mockedTurn = new Turn() {winner = winner, current_turn = currentTurn};
-            mockAccess.Setup(a => a.CreateGame(It.IsAny<string>())).ReturnsAsync(mockedResult);
-            mockAccess.Setup(a => a.CheckTurn(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(mockedTurn);
-            WarRoom board = await WarRoom.CreateWarRoom(mockAccess.Object);
-
-            TurnStatus actual = await board.TakeTurn();
-
-            Assert.Equal(status, actual);
         }
     }
 }

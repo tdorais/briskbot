@@ -20,12 +20,17 @@ namespace briskbot.game
         private readonly IGameAccess access;
         private readonly GameResult gameInfo;
 
+        public int GameId
+        {
+            get {
+                return gameInfo.game;
+            }
+        }
+        
         public async static Task<WarRoom> CreateWarRoom(IGameAccess newAccess)
         {
             GameResult newInfo = await newAccess.CreateGame("Pinky and the Brain");
             WarRoom newRoom = new WarRoom(newAccess, newInfo);
-
-            Console.WriteLine($"Game: {newInfo.game}");
 
             return newRoom;
         }
