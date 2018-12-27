@@ -20,7 +20,7 @@ namespace briskbot.access
         public async Task<GameResult> CreateGame(string teamName)
         {
             string url = "/v1/brisk/game";
-            StringContent content = new StringContent($"{{sdf\"join\": true, \"team_name\": \"{teamName}\"}}"); //refactor into serialized object
+            StringContent content = new StringContent($"{{\"join\": true, \"team_name\": \"{teamName}\"}}"); //refactor into serialized object
             
             return await Post<GameResult>(url, content);
         }
