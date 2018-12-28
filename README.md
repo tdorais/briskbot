@@ -7,6 +7,7 @@ Imported Nuget Packages:
 * xUnit
 * Moq
 * Newtonsoft.Json
+
 *This document will be subject to change*
 
 ## Roadmap
@@ -20,10 +21,10 @@ Imported Nuget Packages:
 * ~~Error Handling~~
   * ~~Handle faulty server calls~~
 * ~~Set armies randomly~~
-* Attack randomly
-  * requires map awareness
+* Attack adjacent territories
+  * requires basic map graph
 * Clean up "config" settings, like urls
-* Refine console logging
+* Use serialized contracts for POST body
 * Implement strategies
   * Analysize map
   * Set continent goals
@@ -54,7 +55,7 @@ Imported Nuget Packages:
   * Test names should read well in English and follow this format: {subject} {conditions} {results}
 * Async
   * Call async methods from async whenever possible.
-  * Only in the main console app will we block and wait for the tasks to resolve, since there is only one thread at the console, it will be deadlocked with any competing resources.
+  * Only in the main console app will we block the tasks
 * HttpClient is created in Main and left open to reduce overhead of spinning new clients for each request
   * new HttpClients can take ~35 ms to instantiate.
   * The application life is short enough to not run into problems like invalid DNS registers.

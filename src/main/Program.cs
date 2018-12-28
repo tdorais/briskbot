@@ -16,11 +16,9 @@ namespace briskbot
         {
             Console.CancelKeyPress += new ConsoleCancelEventHandler(NuclearOption);
 
-            Uri endpoint = new Uri("http://www.briskchallenge.com");
-
             using(var client = new HttpClient())
             {
-                client.BaseAddress = endpoint;
+                client.BaseAddress = new Uri("http://www.briskchallenge.com");
 
                 run(client).GetAwaiter().GetResult();  
             }
