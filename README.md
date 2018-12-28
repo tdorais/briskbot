@@ -3,6 +3,10 @@ A bot for the [brisk challenge](http://www.briskchallenge.com)
 
 Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/2.2)
 
+Imported Nuget Packages:
+* xUnit
+* Moq
+* Newtonsoft.Json
 *This document will be subject to change*
 
 ## Roadmap
@@ -15,11 +19,11 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
   * ~~API: End Turn~~
 * ~~Error Handling~~
   * ~~Handle faulty server calls~~
+* ~~Set armies randomly~~
+* Attack randomly
+  * requires map awareness
 * Clean up "config" settings, like urls
 * Refine console logging
-* Set armies randomly
-  * requies mapping
-* Attack randomly
 * Implement strategies
   * Analysize map
   * Set continent goals
@@ -66,3 +70,4 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
 ## Bug Report
 *AKA: my shame*
 * Ctrl+C is not exitting program.
+* Exceptions are being spit out to the console (intentional for now)

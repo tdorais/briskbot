@@ -12,9 +12,41 @@ namespace briskbot.access
     {        
         private IApiClient client;
 
+        private GameResult gameInfo;
+
+        public int GameId
+        {
+            get {
+                return gameInfo.game;
+            }
+        }
+
+        public string Token
+        {
+            get {
+                return gameInfo.token;
+            }
+        }
+
+        public int CurrentPlayer
+        {
+            get {
+                return gameInfo.player;
+            }
+        }
+        
+        public async static Task<IGameAccess> Create(IApiClient openClient, string teamName)
+        {
+            GameAccess newAccess = new GameAccess(openClient);
+            newAccess.gameInfo = await newAccess.CreateGame(teamName);
+
+            return newAccess;
+        }
+
         public GameAccess(IApiClient openClient)
         {
             client = openClient;
+            gameInfo = new GameResult() {game = 0, token = "", player = 0};
         }
 
         public async Task<GameResult> CreateGame(string teamName)
@@ -25,28 +57,31 @@ namespace briskbot.access
             return await Post<GameResult>(url, content);
         }
 
-        public async Task<PlayerState> GetPlayerState(int gameId, int playerId)
+        public async Task<PlayerState> GetPlayerState()
         {
-            string url = $"/v1/brisk/game/{gameId}/player/{playerId}";
+            string url = $"/v1/brisk/game/{GameId}/player/{CurrentPlayer}";
 
             return await Get<PlayerState>(url);
         }
 
-        public async Task<Turn> CheckTurn(int gameId, int playerId)
+        public async Task<bool> PlaceArmies(int territory, int num)
         {
-            string url = $"/v1/brisk/game/{gameId}/player/{playerId}?check_turn=true";
-
-            return await Get<Turn>(url);
-        }
-
-        public async Task<HttpStatusCode> EndTurn(int gameId, int playerId, string token)
-        {
-            string url = $"/v1/brisk/game/{gameId}/player/{playerId}";
-            StringContent content = new StringContent($"{{\"token\": \"{token}\", \"end_turn\": true}}");
+            string url = $"/v1/brisk/game/{GameId}/player/{CurrentPlayer}/territory/{territory}";
+            StringContent content = new StringContent($"{{\"token\":\"{Token}\", \"num_armies\":{num}}}");
 
             HttpResponseMessage response = await client.Post(url, content);
 
-            return response.StatusCode;
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> EndTurn()
+        {
+            string url = $"/v1/brisk/game/{GameId}/player/{CurrentPlayer}";
+            StringContent content = new StringContent($"{{\"token\": \"{Token}\", \"end_turn\": true}}");
+
+            HttpResponseMessage response = await client.Post(url, content);
+
+            return response.IsSuccessStatusCode;
         }
 
         private async Task<T> Get<T>(string url)
@@ -59,7 +94,7 @@ namespace briskbot.access
 
             T result = JsonConvert.DeserializeObject<T>(content);
 
-            return result;           
+            return result;
         }
 
         private async Task<T> Post<T>(string url, HttpContent httpContent)
@@ -73,7 +108,7 @@ namespace briskbot.access
 
             T result = JsonConvert.DeserializeObject<T>(content);
 
-            return result;           
+            return result;
         }
     }
 }

@@ -12,10 +12,10 @@ namespace briskbot.access
         public string service;
         
         [JsonProperty]
-        public bool current_turn;
+        public bool? current_turn;
         
         [JsonProperty]
-        public int winner;
+        public int? winner;
         
         [JsonProperty]
         public bool eliminated;

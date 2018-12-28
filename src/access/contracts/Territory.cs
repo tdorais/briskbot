@@ -10,7 +10,10 @@ namespace briskbot.access
         
         [JsonProperty]
         public int player;
-        
+                
+        [JsonProperty]
+        public string territory_name;
+
         [JsonProperty]
         public int num_armies;
     }

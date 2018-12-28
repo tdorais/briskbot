@@ -18,48 +18,37 @@ namespace briskbot.game
     public class WarRoom
     {
         private readonly IGameAccess access;
-        private readonly GameResult gameInfo;
-
-        public int GameId
-        {
-            get {
-                return gameInfo.game;
-            }
-        }
         
-        public async static Task<WarRoom> CreateWarRoom(IGameAccess newAccess)
-        {
-            GameResult newInfo = await newAccess.CreateGame("Pinky and the Brain");
-            WarRoom newRoom = new WarRoom(newAccess, newInfo);
-
-            return newRoom;
-        }
-        private WarRoom(IGameAccess newAccess, GameResult info)
+        public WarRoom(IGameAccess newAccess)
         {
             access = newAccess;
-            gameInfo = info;
         }
 
         public async Task<TurnStatus> TakeTurn()
         {
-            Turn gameState = await access.CheckTurn(gameInfo.game, gameInfo.player);
+            PlayerState state = await access.GetPlayerState();
 
-            int winner = gameState.winner ?? 0;
-            if(winner == gameInfo.player)
+            //Bouncer methods to shortcut out of taking the turn
+            {
+            int winner = state.winner ?? 0;
+            if(winner == access.CurrentPlayer)
                 return TurnStatus.WonGame;
             else if (winner > 0)
                 return TurnStatus.LostGame;
-            
 
-            var turn = TurnStatus.Waiting;
-            if(gameState.current_turn ?? false)
-            {
-                await access.EndTurn(gameInfo.game, gameInfo.player, gameInfo.token);
-                turn = TurnStatus.TookTurn;
+            if(!(state.current_turn ?? false))  
+                return TurnStatus.Waiting;
             }
 
-            Thread.Sleep(1000); //optimize
-            return turn;
+            Territory HQ = state.territories[0];
+
+            bool placed = await access.PlaceArmies(HQ.territory, state.num_reserves);
+            if(placed)
+                Console.WriteLine($"Reinforced {HQ.territory_name} with {state.num_reserves} battalions");
+            
+            await access.EndTurn();
+
+            return TurnStatus.TookTurn;
         }
     }
 }

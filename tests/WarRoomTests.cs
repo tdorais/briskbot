@@ -13,11 +13,13 @@ namespace briskbot.tests
     {
         private readonly Mock<IApiClient> mockClient;
         private readonly Mock<IGameAccess> mockAccess;
+        private readonly WarRoom board;
 
         public WarRoomTests()
         {
             mockClient = new Mock<IApiClient>();
             mockAccess = new Mock<IGameAccess>();
+            board = new WarRoom(mockAccess.Object);
         }
 
         [Theory]
@@ -32,10 +34,11 @@ namespace briskbot.tests
         public async Task TakeTurnReturnsStatus(bool currentTurn, int? winner, TurnStatus status)
         {
             GameResult mockedResult = new GameResult(){player = 1};
-            Turn mockedTurn = new Turn() {winner = winner, current_turn = currentTurn};
-            mockAccess.Setup(a => a.CreateGame(It.IsAny<string>())).ReturnsAsync(mockedResult);
-            mockAccess.Setup(a => a.CheckTurn(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(mockedTurn);
-            WarRoom board = await WarRoom.CreateWarRoom(mockAccess.Object);
+            PlayerState mockedState = new PlayerState() {winner = winner, current_turn = currentTurn, territories = new Territory[] { new Territory() { territory = 1, territory_name = ""}}};
+
+            mockAccess.Setup(a => a.CurrentPlayer).Returns(1);
+            mockAccess.Setup(a => a.GetPlayerState()).ReturnsAsync(mockedState);
+            mockAccess.Setup(a => a.PlaceArmies(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(true);
 
             TurnStatus actual = await board.TakeTurn();
 
