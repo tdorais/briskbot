@@ -3,6 +3,10 @@ A bot for the [brisk challenge](http://www.briskchallenge.com)
 
 Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/2.2)
 
+Imported Nuget Packages:
+* xUnit
+* Moq
+* Newtonsoft.Json
 *This document will be subject to change*
 
 ## Roadmap
@@ -13,13 +17,13 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
 * ~~Implement pass-turn-till-end gameplay~~
   * ~~API: Check for Turn~~
   * ~~API: End Turn~~
-* Error Handling
-  * Handle faulty server calls
+* ~~Error Handling~~
+  * ~~Handle faulty server calls~~
+* ~~Set armies randomly~~
+* Attack randomly
+  * requires map awareness
 * Clean up "config" settings, like urls
 * Refine console logging
-* Set armies randomly
-  * requies mapping
-* Attack randomly
 * Implement strategies
   * Analysize map
   * Set continent goals
@@ -47,12 +51,17 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
   * Unit Tests should define what is expected from a function
   * Only build and test what you need
   * Created used decorator pattern over HttpClient for dependency injection and mocking
+  * Test names should read well in English and follow this format: {subject} {conditions} {results}
 * Async
   * Call async methods from async whenever possible.
   * Only in the main console app will we block and wait for the tasks to resolve, since there is only one thread at the console, it will be deadlocked with any competing resources.
 * HttpClient is created in Main and left open to reduce overhead of spinning new clients for each request
   * new HttpClients can take ~35 ms to instantiate.
   * The application life is short enough to not run into problems like invalid DNS registers.
+* Error Handling
+  * Throwing basic exceptions until a more defined granularity presents itself
+  * Leaving exceptions uncaught initially for complete clarity during development.
+  * More precise exception handling can be done once the reason presents itself. For now, complete meltdowns work best.
 
 ## What I Could Have Done Differently
 * Using .NET Framework (and going solution heavy with Visual Studio) could have saved some time
@@ -61,3 +70,4 @@ Requirements: [.NET Core 2.2](https://dotnet.microsoft.com/download/dotnet-core/
 ## Bug Report
 *AKA: my shame*
 * Ctrl+C is not exitting program.
+* Exceptions are being spit out to the console (intentional for now)

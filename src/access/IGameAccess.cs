@@ -5,12 +5,16 @@ namespace briskbot.access
 {
     public interface IGameAccess
     {
+        int GameId { get; }
+        string Token { get; }
+        int CurrentPlayer { get; }
+
         Task<GameResult> CreateGame(string teamName);
 
-        Task<PlayerState> GetPlayerState(int gameId, int playerId);
+        Task<PlayerState> GetPlayerState();
+        
+        Task<bool> PlaceArmies(int territory, int num);
 
-        Task<Turn> CheckTurn(int gameId, int playerId);
-
-        Task<HttpStatusCode> EndTurn(int gameId, int playerId, string token);
+        Task<bool> EndTurn();
     }
 }

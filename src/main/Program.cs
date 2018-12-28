@@ -29,10 +29,12 @@ namespace briskbot
         public async static Task run(HttpClient client)
         {
             IApiClient apiClient = new ApiClient(client);
-            GameAccess newAccess = new GameAccess(apiClient);  
-            WarRoom board = await WarRoom.CreateWarRoom(newAccess);
-            int waitCount = 0;
+            IGameAccess newAccess = await GameAccess.Create(apiClient, "Pinky and the Brain");  
+            WarRoom board = new WarRoom(newAccess);
 
+            Console.WriteLine($"Game: {newAccess.GameId}");
+
+            int waitCount = 0;
             while(waitCount < 10)
             {
                 TurnStatus state = await board.TakeTurn();
@@ -44,7 +46,7 @@ namespace briskbot
                         waitCount = 0;
                         break;
                     case TurnStatus.Waiting:
-                        Console.WriteLine("waits patiently...");
+                        Console.WriteLine("Waits patiently...");
                         waitCount++;
                         break;
                     case TurnStatus.LostGame:
@@ -57,6 +59,8 @@ namespace briskbot
                         Console.WriteLine("Status Unavailable");
                     break;
                 }
+                
+                Thread.Sleep(1000); //optimize
             }
         }
 
